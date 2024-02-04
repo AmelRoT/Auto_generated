@@ -1,22 +1,10 @@
 import imaplib
 import email
 import os
-from datetime import datetime,timedelta
-from pyfiglet import Figlet
-import subprocess
-import glob
+from datetime import datetime
 
 email_address = "remix.sarajevo@gmail.com"
 password = "cuqi puem aslj mpik"
-
-
-
-def generate_ascii_art(text, font="standard"):
-    fig = Figlet(font=font)
-    ascii_art = fig.renderText(text)
-    print(ascii_art)
-
-
 
 def download_attachments_from_lapace(email_address, password, start_date, end_date):
     SMTP_SERVER = "imap.gmail.com"
@@ -26,19 +14,16 @@ def download_attachments_from_lapace(email_address, password, start_date, end_da
     mail = imaplib.IMAP4_SSL(SMTP_SERVER)
     mail.login(email_address, password)
     print("Logged in successfully") 
-    mail.select(b'"[Gmail]/All Mail"')
-    download_folder = r"C:\Users\Amel\Desktop\Printanje"  # Replace with the desired folder path
+    mail.select("inbox")
+    download_folder = r"C:\Users\Amel\Downloads"  # Replace with the desired folder path
 
     # Define the download folder
     download_folder = os.path.abspath(download_folder)  # Use absolute path
     print(f"Download folder: {download_folder}")
 
     # Search for emails within the specified date range and from specific senders
-    start_date1 = datetime.strptime(start_date, "%d.%m.%Y")
-    end_date1 = datetime.strptime(end_date, "%d.%m.%Y")
-    end_date1 = end_date1+ timedelta(days=1); # includes the last date 
-    start_date_str = start_date1.strftime("%d-%b-%Y")
-    end_date_str = end_date1.strftime("%d-%b-%Y")
+    start_date_str = start_date.strftime("%d-%b-%Y")
+    end_date_str = end_date.strftime("%d-%b-%Y")
 
     search_criteria_izvodi = f'(FROM "izvodi.pravne@unicreditgroup.ba" SINCE {start_date_str} BEFORE {end_date_str})'
     search_criteria_info_rbbh = f'(FROM "info.rbbh@rbbh.ba" SINCE {start_date_str} BEFORE {end_date_str})'
@@ -76,25 +61,14 @@ def download_attachments_from_lapace(email_address, password, start_date, end_da
                     print(f"Skipping non-PDF attachment: {att_fn}")
             except Exception as e:
                 print(f"Error downloading attachment: {str(e)}")
+
+    print("Finished")
     # Logout and close the connection
     mail.logout()
 
-print("Unesti Period npr. OD : 01.01.2023  DO : 01.02.2023 ") 
-start_date = input("OD : ") 
-end_date = input("DO : ") 
-
+# Specify the date range (December 1, 2023, to January 1, 2024)
+end_date = datetime(2024, 1, 1)
+start_date = datetime(2023, 12, 1)
 
 # Call the function to download PDF attachments from specific senders within the specified date range
 download_attachments_from_lapace(email_address, password, start_date, end_date)
-    
-
-
-pdf_directory = r'C:\Users\Amel\Desktop\Printanje\*.pdf'
-
-# Get a list of all PDF files in the directory
-pdf_files = glob.glob(pdf_directory)
-
-for pdf_file in pdf_files:
-    os.startfile(pdf_file, 'Print')
-
-generate_ascii_art("Kraj")
